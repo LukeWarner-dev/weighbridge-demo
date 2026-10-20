@@ -1,10 +1,10 @@
-\# Weighbridge demo (C# / .NET 8 / SQL Server)
+Weighbridge demo (C# / .NET 8 / SQL Server)
 
 A small weighbridge system I built to learn the domain:
 
-\- \*\*ScaleDemo\*\*: reads weights from a simulated indicator over TCP, ignores noise, only accepts stable readings.
+ScaleDemo: reads weights from a simulated indicator over TCP, ignores noise, only accepts stable readings.
 
-\- \*\*WeighbridgeApi\*\*: ASP.NET Core minimal API for first and second weighs (gross, tare, nett) on SQL Server Express, with validation, parameterised queries, and a daily tonnage report as JSON or CSV.
+WeighbridgeApi: ASP.NET Core minimal API for first and second weighs (gross, tare, nett) on SQL Server Express, with validation, parameterised queries, and a daily tonnage report as JSON or CSV.
 
 
 
