@@ -1,0 +1,33 @@
+# Open this file in Visual Studio 2022 or VS Code (REST Client extension) and click "Send Request".
+# Use the port printed by `dotnet run` (usually 5000 or 5xxx).
+@host = http://localhost:5000
+
+### 1. Health check
+GET {{host}}/
+
+### 2. First weigh: loaded truck arrives (gross)
+POST {{host}}/weighings
+Content-Type: application/json
+
+{ "registration": "CA 123-456", "product": "Wheat", "grossKg": 34560 }
+
+### 3. Validation: tare heavier than gross should be rejected (400). Change 1 to the id returned above.
+POST {{host}}/weighings/1/second
+Content-Type: application/json
+
+{ "tareKg": 99999 }
+
+### 4. Second weigh: truck leaves empty (tare). Same id as above.
+POST {{host}}/weighings/1/second
+Content-Type: application/json
+
+{ "tareKg": 14200 }
+
+### 5. Look up the ticket (nett is now filled in)
+GET {{host}}/weighings/1
+
+### 6. Today's report (JSON)
+GET {{host}}/reports/daily
+
+### 7. Today's report as CSV (opens in Excel)
+GET {{host}}/reports/daily.csv
