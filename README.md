@@ -8,7 +8,7 @@ WeighbridgeApi: ASP.NET Core minimal API for first and second weighs (gross, tar
 
 
 
-\## Run it
+\ Run it
 
 1\. .NET 8 SDK and SQL Server Express (`localhost\\SQLEXPRESS`).
 
@@ -18,7 +18,7 @@ WeighbridgeApi: ASP.NET Core minimal API for first and second weighs (gross, tar
 
 
 
-\## What I learned
+\ What I learned
 
 Stable-weight detection, REST status codes, SQL Server from C#, and report queries with GROUP BY.
 
