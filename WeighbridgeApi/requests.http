@@ -31,3 +31,24 @@ GET {{host}}/reports/daily
 
 ### 7. Today's report as CSV (opens in Excel)
 GET {{host}}/reports/daily.csv
+
+### 8. Operator weighs from the scale (allowed)
+POST {{host}}/weighings
+Content-Type: application/json
+
+{ "registration": "CY 88-201", "product": "Maize", "grossKg": 31200, "user": "luke" }
+
+### 9. Operator tries to TYPE a weight in by hand (blocked: 403)
+POST {{host}}/weighings
+Content-Type: application/json
+
+{ "registration": "CF 777-100", "product": "Barley", "grossKg": 29800, "user": "luke", "manualEntry": true }
+
+### 10. Supervisor overrides (allowed, and logged as an override)
+POST {{host}}/weighings
+Content-Type: application/json
+
+{ "registration": "CF 777-100", "product": "Barley", "grossKg": 29800, "user": "supervisor", "manualEntry": true }
+
+### 11. View the audit log
+GET {{host}}/audit

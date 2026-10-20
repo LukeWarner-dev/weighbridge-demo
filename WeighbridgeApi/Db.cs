@@ -45,6 +45,17 @@ public static class Db
             );
             """;
         cmd.ExecuteNonQuery();
+        cmd.CommandText = """
+            IF OBJECT_ID('dbo.AuditLog') IS NULL
+            CREATE TABLE dbo.AuditLog (
+                Id      INT IDENTITY(1,1) PRIMARY KEY,
+                [User]  VARCHAR(50)  NOT NULL,
+                Action  VARCHAR(50)  NOT NULL,
+                Details VARCHAR(400) NULL,
+                At      DATETIME2    NOT NULL DEFAULT SYSDATETIME()
+            );
+            """;
+        cmd.ExecuteNonQuery();
     }
 
     public static int InsertFirstWeigh(FirstWeighRequest req)
@@ -126,5 +137,29 @@ public static class Db
         while (r.Read())
             totals.Add(new ProductTotal(r.GetString(0), r.GetInt32(1), r.GetInt64(2)));
         return totals;
+    }
+
+    public static void WriteAudit(string user, string action, string details)
+    {
+        using var conn = Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT INTO dbo.AuditLog ([User], Action, Details) VALUES (@user, @action, @details);";
+        cmd.Parameters.AddWithValue("@user", user);
+        cmd.Parameters.AddWithValue("@action", action);
+        cmd.Parameters.AddWithValue("@details", details);
+        cmd.ExecuteNonQuery();
+    }
+
+    public static List<AuditEntry> RecentAudit()
+    {
+        using var conn = Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT TOP 50 Id, [User], Action, Details, At FROM dbo.AuditLog ORDER BY Id DESC;";
+        using var r = cmd.ExecuteReader();
+        var list = new List<AuditEntry>();
+        while (r.Read())
+            list.Add(new AuditEntry(r.GetInt32(0), r.GetString(1), r.GetString(2),
+                r.IsDBNull(3) ? null : r.GetString(3), r.GetDateTime(4).ToString("yyyy-MM-dd HH:mm:ss")));
+        return list;
     }
 }
