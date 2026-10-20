@@ -3,10 +3,10 @@ using System.Net.Sockets;
 using System.Text;
 
 // Pretends to be a weighbridge indicator so you can develop without real hardware.
-// It accepts one connection and streams a truck driving on and settling at a target weight.
+// spaceFormat = false: brand 1 "ST,GS,+0024560kg"   spaceFormat = true: brand 2 "  24560 kg G S"
 public static class ScaleSimulator
 {
-    public static async Task RunAsync(int port, int targetKg, CancellationToken ct)
+    public static async Task RunAsync(int port, int targetKg, CancellationToken ct, bool spaceFormat = false)
     {
         var listener = new TcpListener(IPAddress.Loopback, port);
         listener.Start();
@@ -20,8 +20,12 @@ public static class ScaleSimulator
             while (!ct.IsCancellationRequested)
             {
                 if (current < targetKg) current = Math.Min(targetKg, current + random.Next(3000, 8000));
-                string status = current == targetKg ? "ST" : "US";
-                await writer.WriteLineAsync($"{status},GS,{current:+0000000}kg");
+                bool stable = current == targetKg;
+
+                string line = spaceFormat
+                    ? $"{current,7} kg G {(stable ? "S" : "M")}"
+                    : $"{(stable ? "ST" : "US")},GS,{current:+0000000}kg";
+                await writer.WriteLineAsync(line);
 
                 if (random.Next(8) == 0) await writer.WriteLineAsync("#noise#");   // real cables are noisy
 

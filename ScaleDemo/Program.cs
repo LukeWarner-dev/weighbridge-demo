@@ -8,12 +8,17 @@ Check(ScaleParser.Parse("US,GS,+0001000kg")?.IsStable == false, "unstable line i
 Check(ScaleParser.Parse("#noise#") is null, "noise is ignored");
 Check(ScaleParser.Parse("ST,GS,+00ABCkg") is null, "corrupt weight is ignored");
 
+var space = new SpaceFormat();
+Check(space.Parse("  24560 kg G S") == new ScaleReading(true, 24560), "space format: stable line parses");
+Check(space.Parse("  18000 kg G M")?.IsStable == false, "space format: motion is flagged");
+Check(space.Parse("#noise#") is null, "space format: noise is ignored");
+
 // 2. Start the fake scale, then read from it like real software would.
 const int Port = 5050;
 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));   // never hang forever
-var simulator = ScaleSimulator.RunAsync(Port, targetKg: 24560, cts.Token);
+var simulator = ScaleSimulator.RunAsync(Port, targetKg: 24560, cts.Token, spaceFormat: true);
 
-IScaleReader scale = new TcpScaleReader("127.0.0.1", Port);
+IScaleReader scale = new TcpScaleReader("127.0.0.1", Port, new SpaceFormat());
 Console.WriteLine("Truck driving onto the weighbridge...");
 
 try
